@@ -461,11 +461,12 @@ const App = () => {
   const [account, setAccount] = useState('');
   const [walletAddress, setWalletAddress] = useState('');
   const [nftName, setnftName] = useState('');
-  const [nftDescription, setnftDescription] = useState('')
-  const [nftAmount, setnftAmmount] = useState('')
-  const [nftQuanitiy, setnftQuanitiy] = useState('')
-  const [nftBaseTokenURI, setNftBaseTokenUri] = useState('')
-  const [nftAmountProvider, setnftAmountProvider] = useState('')
+  const [nftDescription, setnftDescription] = useState('');
+  const [nftAmount, setnftAmmount] = useState('');
+  const [nftQuanitiy, setnftQuanitiy] = useState('');
+  const [nftBaseTokenURI, setNftBaseTokenUri] = useState('');
+  const [nftAmountProvider, setnftAmountProvider] = useState('');
+  const [tokenId, setTokenid] = useState('');
 
   // const [contractData, setContractData] = useState('');
 
@@ -553,7 +554,6 @@ const App = () => {
     }
   };
 
-
   // const fetchDataFromContract = async () => {
   //   try {
   //     // Call a read-only function on the smart contract
@@ -601,40 +601,60 @@ const App = () => {
       console.error('Error interacting with the contract:', error.message);
     }
   };
-
+  const buyNft = async () => {
+    try {
+      const transactionbuy = await contract.buy(
+        nftName,
+        nftDescription,
+        nftAmount,
+        tokenId
+      );
+      await transactionbuy.wait();
+      console.log('Buy nft successful!');
+    } catch (error) {
+      console.error('Error to buy a nft: ', error.message);
+    }
+  };
   return (
     <>
-      <div>
-        <div className="mt-4 flex justify-center items-center gap-3">
-          <p className="text-3xl  font-bold leading-normal tracking-normal ml-4 bg-gradient-to-r from-teal-400 to-yellow-200 bg-clip-text text-transparent">
-            ANRYTON Nft Contract Deploy
-          </p>
-          <button className="w-auto h-[25px] p-5  bg-gradient-to-r from-amber-600 to-pink-600 rounded-[30px] justify-center items-center gap-2 inline-flex"   onClick={connectWallet}>
-            <span className="text-white text-md font-medium leading-normal tracking-wide">
-            {walletAddress && walletAddress.length > 0
-                ? `${walletAddress}`
-                : '🦊   Connect Wallet'}
-            </span>
-          </button>
+      <div className="bg-gradient-to-r from-violet-200 to-pink-200 h-dvh">
+        <div className="flex justify-center items-center gap-3">
+          <div className="mt-4">
+            <p className="text-3xl  font-bold leading-normal tracking-normal ml-4 bg-gradient-to-r from-teal-400 to-yellow-200 bg-clip-text text-transparent">
+              ANRYTON Nft Contract Deploy
+            </p>
+
+            <button
+              className="w-auto h-[25px] p-5  bg-gradient-to-r from-amber-600 to-pink-600 rounded-[30px] justify-center items-center gap-2 inline-flex"
+              onClick={connectWallet}
+            >
+              <span className="text-white text-md font-medium leading-normal tracking-wide">
+                {walletAddress && walletAddress.length > 0
+                  ? `🦊  ${walletAddress}`
+                  : '🦊   Connect Wallet'}
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* <br /> */}
         <div className="flex mr-5 justify-center">
-          <div className="ml-4"></div>
-
           <div className="ml-4">
             <form className="w-[30rem] mt-4 p-8 border border-gray-600 rounded-3xl">
+              <span className="text-black mb-5 text-md font-extrabold tracking-wide">
+                CreateNft 🛠️
+              </span>
               <div className="mb-4">
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium tracking-wide text-gray-600"
+                  className="block text-sm font-bold  tracking-wide text-gray-600"
                 >
                   Name
                 </label>
                 <input
                   type="text"
                   id="name"
-                  className="mt-1 p-2 border rounded-md border-gray-600 w-full"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
                   placeholder="Enter the nft name"
                   onChange={(e) => setnftName(e.target.value)}
                 />
@@ -643,14 +663,14 @@ const App = () => {
               <div className="mb-4">
                 <label
                   htmlFor="description"
-                  className="block text-sm font-medium tracking-wide text-gray-600"
+                  className="block text-sm font-bold tracking-wide text-gray-600"
                 >
                   Description
                 </label>
                 <textarea
                   type="text"
                   id="description"
-                  className="mt-1 p-2 border rounded-md border-gray-600 w-full"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
                   placeholder="Enter a decrption of NFT"
                   onChange={(e) => setnftDescription(e.target.value)}
                 />
@@ -659,14 +679,14 @@ const App = () => {
               <div className="mb-4">
                 <label
                   htmlFor="amount"
-                  className="block text-sm font-medium text-gray-600"
+                  className="block text-sm font-bold text-gray-600"
                 >
                   Amount
                 </label>
                 <input
                   type="number"
                   id="amount"
-                  className="mt-1 p-2 border rounded-md border-gray-600 w-full"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
                   placeholder="Enter a Amount of NFT"
                   onChange={(e) => setnftAmmount(e.target.value)}
                 />
@@ -675,15 +695,17 @@ const App = () => {
               <div className="mb-4">
                 <label
                   htmlFor="quantity"
-                  className="block text-sm font-medium text-gray-600"
+                  className="block text-sm font-bold text-gray-600"
                 >
                   Quantity
                 </label>
                 <input
                   type="number"
                   id="quantity"
-                  className="mt-1 p-2 border rounded-md border-gray-600 w-full"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
                   placeholder="Enter a Quantity"
+                  min="0"
+                  max="10"
                   onChange={(e) => setnftQuanitiy(e.target.value)}
                 />
               </div>
@@ -691,14 +713,14 @@ const App = () => {
               <div className="mb-4">
                 <label
                   htmlFor="baseTokenURI"
-                  className="block text-sm font-medium text-gray-600"
+                  className="block text-sm font-bold text-gray-600"
                 >
                   Base Token URI 🔗
                 </label>
                 <input
                   type="text"
                   id="baseTokenURI"
-                  className="mt-1 p-2 border rounded-md border-gray-600 w-full"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
                   placeholder="Enter a Base URI"
                   onChange={(e) => setNftBaseTokenUri(e.target.value)}
                 />
@@ -707,14 +729,14 @@ const App = () => {
               <div className="mb-4">
                 <label
                   htmlFor="amountProvider"
-                  className="block text-sm font-medium text-gray-600"
+                  className="block text-sm font-bold text-gray-600"
                 >
                   Amount Provider
                 </label>
                 <input
                   type="text"
                   id="amountProvider"
-                  className="mt-1 p-2 border rounded-md border-gray-600 w-full"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
                   placeholder="Enter a address Amount Provider"
                   onChange={(e) => setnftAmountProvider(e.target.value)}
                 />
@@ -722,11 +744,91 @@ const App = () => {
 
               <button
                 type="button"
-                className="w-auto h-[25px] p-5 ml-4 bg-gradient-to-r from-amber-600 to-pink-600 rounded-[30px] justify-center items-center gap-2 inline-flex"
+                className="w-[26rem] h-[25px] p-5 bg-gradient-to-r from-amber-600 to-pink-600 rounded-[30px] justify-center items-center gap-2 inline-flex"
                 onClick={createNFt}
               >
-                <span className="text-white text-md font-medium  tracking-wide">
+                <span className="text-white text-md font-bold  tracking-wide">
                   CreateNft 🛠️
+                </span>
+              </button>
+            </form>
+          </div>
+          <div className="ml-4">
+            <form className="w-[30rem] mt-4 p-8 border border-gray-600 rounded-3xl">
+              <span className="text-black mb-5 text-md font-extrabold tracking-wide">
+                Buy NFT
+              </span>
+              <div className="mb-4">
+                <label
+                  htmlFor="name"
+                  className="block text-sm font-bold tracking-wide text-gray-600"
+                >
+                  Name
+                </label>
+                <input
+                  type="text"
+                  id="name"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
+                  placeholder="Enter the nft name"
+                  onChange={(e) => setnftName(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="description"
+                  className="block text-sm font-bold tracking-wide text-gray-600"
+                >
+                  Description
+                </label>
+                <textarea
+                  type="text"
+                  id="description"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
+                  placeholder="Enter a decrption of NFT"
+                  onChange={(e) => setnftDescription(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="amount"
+                  className="block text-sm font-bold text-gray-600"
+                >
+                  Amount
+                </label>
+                <input
+                  type="number"
+                  id="amount"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
+                  placeholder="Enter a Amount of NFT"
+                  onChange={(e) => setnftAmmount(e.target.value)}
+                />
+              </div>
+
+              <div className="mb-4  ">
+                <label
+                  htmlFor="tokenid"
+                  className="block text-sm font-bold text-gray-600"
+                >
+                  Token ID
+                </label>
+                <input
+                  type="number"
+                  id="Tokenid"
+                  className="mt-1 p-2 border rounded-md bg-inherit shadow-lg border-gray-600 w-full"
+                  placeholder="Enter a Tokenid"
+                  onChange={(e) => setTokenid(e.target.value)}
+                />
+              </div>
+
+              <button
+                type="button"
+                className="w-[26rem] h-[25px] p-5 bg-gradient-to-r from-amber-600 to-pink-600 rounded-[30px] justify-center items-center gap-2 inline-flex"
+                onClick={buyNft}
+              >
+                <span className="text-white text-md font-bold  tracking-wide">
+                  BUY
                 </span>
               </button>
             </form>
